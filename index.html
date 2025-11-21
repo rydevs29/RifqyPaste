@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RifqyPaste – Paste Tanpa Server</title>
+  <title>RifqyPaste – Paste Cepat & Aman</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
@@ -11,80 +11,92 @@
     .gradient-text { background: linear-gradient(to right, #a855f7, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; }
   </style>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center p-6">
+<body class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center p-4">
   <div class="max-w-4xl w-full">
 
-    <!-- Form -->
-    <div id="form" class="bg-gray-800 rounded-2xl p-10 shadow-2xl">
-      <h1 class="text-5xl font-bold text-center mb-10 gradient-text">RifqyPaste</h1>
+    <!-- Form Paste -->
+    <div id="form" class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
+      <h1 class="text-6xl font-bold text-center mb-10 gradient-text">RifqyPaste</h1>
       <textarea id="content" placeholder="Paste teks / kode di sini..." class="w-full h-64 bg-gray-950 border border-gray-700 rounded-xl p-5 text-sm font-mono focus:outline-none focus:border-purple-500 resize-none" autofocus></textarea>
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        <select id="expire" class="bg-gray-950 border border-gray-700 rounded-xl px-5 py-4">
+        <select id="expire" class="bg-gray-950 border border-gray-700 rounded-xl px-5 py-4 text-gray-300">
           <option value="3600">1 Jam</option>
           <option value="86400" selected>24 Jam</option>
           <option value="604800">7 Hari</option>
           <option value="0">Selamanya</option>
         </select>
-        <input type="password" id="password" placeholder="Password (opsional)" class="bg-gray-950 border border-gray-700 rounded-xl px-5 py-4"/>
-        <button onclick="createPaste()" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 font-bold py-4 rounded-xl transition">
+        <input type="password" id="password" placeholder="Password (opsional)" class="bg-gray-950 border border-gray-700 rounded-xl px-5 py-4 placeholder-gray-500"/>
+        <button onclick="createPaste()" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 font-bold py-4 rounded-xl transition transform hover:scale-105 cursor-pointer">
           Buat Paste Sekarang!
         </button>
       </div>
     </div>
 
-    <!-- View -->
-    <div id="view" class="hidden bg-gray-800 rounded-2xl p-10 shadow-2xl">
+    <!-- View Paste -->
+    <div id="view" class="hidden bg-gray-800 rounded-2xl p-8 shadow-2xl">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold">Paste-mu siap dibagikan!</h2>
-        <button onclick="location.href=''" class="text-purple-400 hover:underline">+ Paste Baru</button>
+        <h2 class="text-3xl font-bold text-purple-400">Paste siap dibagikan!</h2>
+        <button onclick="location.href=''" class="text-purple-400 hover:underline text-lg">+ Paste Baru</button>
       </div>
-      <input type="text" id="link" class="w-full bg-gray-950 rounded-xl px-5 py-4 mb-6 font-mono text-sm" readonly/>
-      <pre class="max-h-96 overflow-auto"><code id="code" class="language-auto rounded-xl p-5 block"></code></pre>
-      <div class="flex gap-4 mt-6">
-        <button onclick="copy('link')" class="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-xl font-medium">Copy Link</button>
-        <button onclick="copy('code')" class="bg-gray-700 hover:bg-gray-600 px-8 py-4 rounded-xl font-medium">Copy Teks</button>
+      <input type="text" id="link" class="w-full bg-gray-950 rounded-xl px-5 py-4 mb-6 font-mono text-sm break-all" readonly/>
+      <pre class="bg-gray-950 rounded-xl p-5 overflow-x-auto border border-gray-800"><code id="code" class="language-auto text-sm"></code></pre>
+      <div class="flex flex-wrap gap-4 mt-6">
+        <button onclick="copy('link')" class="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-xl font-medium transition">Copy Link</button>
+        <button onclick="copy('code')" class="bg-gray-700 hover:bg-gray-600 px-8 py-4 rounded-xl font-medium transition">Copy Teks</button>
       </div>
-      <small class="text-gray-500 block mt-6">Link ini bisa dibuka siapa saja yang punya URL-nya</small>
+      <div class="mt-6 text-sm text-gray-500">
+        Link ini bisa dibuka oleh siapa saja yang punya URL-nya • Data disimpan di URL (aman & privat)
+      </div>
     </div>
   </div>
 
   <script>
-    // Baca dari URL hash saat buka
+    // Baca paste dari hash saat dibuka
     if (location.hash) {
       try {
         const data = JSON.parse(decodeURIComponent(location.hash.slice(1)));
         if (data.expire && Date.now() > data.expire) {
           alert("Paste sudah expired!");
           location.hash = '';
-        } else if (data.password) {
-          const pass = prompt("Masukkan password:");
-          if (pass !== data.password) return alert("Password salah!");
+          return;
+        }
+        if (data.password) {
+          const pass = prompt("Paste ini dilindungi password. Masukkan password:");
+          if (pass !== data.password) {
+            alert("Password salah!");
+            location.href = location.href.split('#')[0];
+            return;
+          }
         }
         document.getElementById('form').classList.add('hidden');
         document.getElementById('view').classList.remove('hidden');
         document.getElementById('code').textContent = data.content;
         document.getElementById('link').value = location.href.split('#')[0];
         Prism.highlightAll();
-      } catch(e) { location.hash = ''; }
+      } catch (e) {
+        alert("Link rusak atau tidak valid.");
+        location.hash = '';
+      }
     }
 
     function createPaste() {
       const content = document.getElementById('content').value.trim();
+      if (!content) {
+        alert("Isi dulu teksnya bro!");
+        return;
+      }
+
       const expire = document.getElementById('expire').value;
       const password = document.getElementById('password').value || null;
-
-      if (!content) return alert("Isi dulu dong!");
 
       const data = {
         content,
         password,
-        expire: expire != '0' ? Date.now() + parseInt(expire)*1000 : 0
+        expire: expire !== '0' ? Date.now() + parseInt(expire) * 1000 : 0
       };
 
-      location.href = location.href.split('#')[0];
       location.hash = encodeURIComponent(JSON.stringify(data));
-
       document.getElementById('link').value = location.href;
       document.getElementById('code').textContent = content;
       document.getElementById('form').classList.add('hidden');
@@ -94,9 +106,10 @@
 
     function copy(type) {
       const el = type === 'link' ? document.getElementById('link') : document.getElementById('code');
-      el.select(); el.setSelectionRange(0, 99999);
+      el.select();
+      el.setSelectionRange(0, 99999);
       document.execCommand('copy');
-      alert("Copied to clipboard!");
+      alert(type === 'link' ? "Link berhasil disalin!" : "Teks berhasil disalin!");
     }
   </script>
 </body>
