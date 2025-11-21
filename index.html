@@ -3,69 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RifqyPaste</title>
-  
-  <!-- Tailwind dari CDN + fallback kalau gagal -->
+  <title>RifqyPaste – Paste Cepat & Aman</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    // Kalau Tailwind gagal load, paksa inject style minimal
-    window.addEventListener('error', function(e) {
-      if (e.filename && e.filename.includes('tailwind')) {
-        document.body.innerHTML = '<div style="padding:20px;font-family:sans-serif;text-align:center;color:#fff;background:#111;">Loading gagal. Coba buka ulang atau pakai WiFi lain.</div>';
-      }
-    });
-  </script>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
   <style>
-    .gradient-text { background: linear-gradient(to right, #a855f7, #ec4899); -webkit-background-clip: text; color: transparent; }
+    .gradient-text { background: linear-gradient(to right, #c084fc, #f472b6); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .btn-gradient { background: linear-gradient(to right, #a855f7, #ec4899); }
+    textarea::placeholder, input::placeholder { opacity: 0.6; }
   </style>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center p-4">
-  <div class="max-w-4xl w-full">
+<body class="bg-[#0f0f1b] text-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-3xl mx-auto">
 
     <!-- Form -->
-    <div id="form" class="bg-gray-800 rounded-2xl p-8 shadow-2xl">
-      <h1 class="text-6xl font-bold text-center mb-10 gradient-text">RifqyPaste</h1>
-      <textarea id="content" placeholder="Paste teks / kode di sini..." class="w-full h-64 bg-gray-950 border border-gray-700 rounded-xl p-5 text-sm font-mono focus:outline-none focus:border-purple-500 resize-none" autofocus></textarea>
+    <div id="form" class="bg-[#161627] rounded-3xl shadow-2xl p-8 border border-purple-900/30">
+      <h1 class="text-5xl md:text-6xl font-black text-center mb-10 gradient-text">RifqyPaste</h1>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        <select id="expire" class="bg-gray-950 border border-gray-700 rounded-xl px-5 py-4">
+      <textarea id="content" placeholder="Paste teks atau kode di sini..." 
+        class="w-full h-64 md:h-80 bg-[#0d0d1a] border border-purple-800/50 rounded-2xl p-6 text-sm md:text-base font-mono focus:outline-none focus:border-purple-500 transition resize-none"
+        autofocus></textarea>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+        <select id="expire" class="bg-[#0d0d1a] border border-purple-800/50 rounded-xl px-5 py-4 focus:border-purple-500 focus:outline-none transition">
           <option value="3600">1 Jam</option>
           <option value="86400" selected>24 Jam</option>
           <option value="604800">7 Hari</option>
           <option value="0">Selamanya</option>
         </select>
-        <input type="password" id="password" placeholder="Password (opsional)" class="bg-gray-950 border border-gray-700 rounded-xl px-5 py-4"/>
-        <button type="button" onclick="createPaste()" class="btn-gradient text-white font-bold py-4 rounded-xl hover:opacity-90 transition">
-          Buat Paste Sekarang!
+        <input type="password" id="password" placeholder="Password (opsional)" 
+          class="bg-[#0d0d1a] border border-purple-800/50 rounded-xl px-5 py-4 placeholder-gray-500 focus:border-purple-500 focus:outline-none transition"/>
+        <button type="button" onclick="createPaste()" 
+          class="btn-gradient text-white font-bold py-4 rounded-xl hover:opacity-90 transform hover:scale-105 transition shadow-lg">
+          Buat Paste
         </button>
       </div>
     </div>
 
-    <!-- View -->
-    <div id="view" class="hidden bg-gray-800 rounded-2xl p-8 shadow-2xl">
-      <h2 class="text-3xl font-bold text-purple-400 mb-6">Paste siap!</h2>
-      <input type="text" id="link" class="w-full bg-gray-950 rounded-xl px-5 py-4 mb-6 font-mono text-sm" readonly/>
-      <pre class="bg-gray-950 rounded-xl p-5 overflow-x-auto"><code id="code" class="language-auto"></code></pre>
-      <div class="flex gap-4 mt-6">
-        <button type="button" onclick="copy('link')" class="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-xl">Copy Link</button>
-        <button type="button" onclick="copy('code')" class="bg-gray-700 hover:bg-gray-600 px-8 py-4 rounded-xl">Copy Teks</button>
-        <button type="button" onclick="location.href=''" class="text-purple-400 underline">Paste Baru</button>
+    <!-- View Paste -->
+    <div id="view" class="hidden bg-[#161627] rounded-3xl shadow-2xl p-8 border border-purple-900/30">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h2 class="text-3xl md:text-4xl font-bold gradient-text">Paste siap!</h2>
+        <button onclick="location.href=''" class="text-purple-400 hover:text-purple-300 underline text-lg">+ Paste Baru</button>
       </div>
+
+      <input type="text" id="link" class="w-full bg-[#0d0d1a] rounded-xl px-6 py-4 mb-6 font-mono text-sm break-all" readonly/>
+
+      <pre class="bg-[#0d0d1a] rounded-2xl p-6 overflow-x-auto border border-purple-800/30 max-h-96">
+<code id="code" class="language-auto text-sm"></code>
+      </pre>
+
+      <div class="flex flex-wrap gap-4 mt-8">
+        <button type="button" onclick="copy('link')" class="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-xl font-medium transition transform hover:scale-105">
+          Copy Link
+        </button>
+        <button type="button" onclick="copy('code')" class="bg-gray-700 hover:bg-gray-600 px-8 py-4 rounded-xl font-medium transition transform hover:scale-105">
+          Copy Teks
+        </button>
+      </div>
+
+      <p class="text-gray-500 text-sm text-center mt-8">
+        Data disimpan di URL • Aman & privat • Bisa dibagikan ke siapa saja
+      </p>
     </div>
   </div>
 
   <script>
-    // Load paste dari hash
     if (location.hash) {
       try {
         const data = JSON.parse(decodeURIComponent(location.hash.slice(1)));
         if (data.expire && Date.now() > data.expire) throw "expired";
         if (data.password) {
-          const p = prompt("Password:");
+          const p = prompt("Masukkan password:");
           if (p !== data.password) throw "wrong";
         }
         document.getElementById('form').classList.add('hidden');
@@ -81,7 +90,7 @@
 
     function createPaste() {
       const content = document.getElementById('content').value.trim();
-      if (!content) return alert("Isi dulu teksnya!");
+      if (!content) return alert("Isi dulu teksnya ya!");
 
       const expire = document.getElementById('expire').value;
       const password = document.getElementById('password').value || null;
@@ -100,7 +109,7 @@
       const el = type === 'link' ? document.getElementById('link') : document.getElementById('code');
       el.select(); el.setSelectionRange(0, 99999);
       document.execCommand('copy');
-      alert("Copied!");
+      alert(type === 'link' ? "Link disalin!" : "Teks disalin!");
     }
   </script>
 </body>
