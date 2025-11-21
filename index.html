@@ -40,14 +40,14 @@
       </div>
     </div>
 
-    <!-- View Paste (SUDAH DIPERBAIKI) -->
+    <!-- View Paste -->
     <div id="view" class="hidden bg-[#161627] rounded-3xl shadow-2xl p-8 border border-purple-900/30">
       <h2 class="text-4xl md:text-5xl font-black text-center mb-10 gradient-text">Paste siap!</h2>
 
       <input type="text" id="link" class="w-full bg-[#0d0d1a] rounded-xl px-6 py-4 mb-6 font-mono text-sm break-all text-center" readonly/>
 
       <pre class="bg-[#0d0d1a] rounded-2xl p-6 overflow-x-auto border border-purple-800/30 max-h-96 mb-8">
-<code id="code" class="language-auto text-sm"></code>
+        <code id="code" class="language-auto text-sm"></code>
       </pre>
 
       <!-- Tombol-tombol rapi di bawah -->
@@ -61,7 +61,7 @@
           Copy Teks
         </button>
         <button type="button" onclick="location.href=''" 
-          class="bg-purple-900/50 hover:bg-purple-800 text-white font-bold py-4 rounded-xl transition transform hover:scale-105 shadow-lg border border-purple-700">
+          class="bg-purple-900/60 hover:bg-purple-800 text-white font-bold py-4 rounded-xl transition transform hover:scale-105 shadow-lg border border-purple-700">
           + Paste Baru
         </button>
       </div>
@@ -73,6 +73,7 @@
   </div>
 
   <script>
+    // Load paste dari URL hash
     if (location.hash) {
       try {
         const data = JSON.parse(decodeURIComponent(location.hash.slice(1)));
@@ -109,10 +110,28 @@
       Prism.highlightAll();
     }
 
+    // COPY YANG 100% JALAN DI SEMUA HP & DESKTOP
     function copy(type) {
-      const el = type === 'link' ? document.getElementById('link') : document.getElementById('code');
-      el.select(); el.setSelectionRange(0, 99999);
+      let text = type === 'link' ? document.getElementById('link').value : document.getElementById('code').textContent;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          alert(type === 'link' ? "Link disalin!" : "Teks disalin!");
+        }).catch(() => fallbackCopy(text, type));
+      } else {
+        fallbackCopy(text, type);
+      }
+    }
+
+    function fallbackCopy(text, type) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
       document.execCommand('copy');
+      document.body.removeChild(textarea);
       alert(type === 'link' ? "Link disalin!" : "Teks disalin!");
     }
   </script>
