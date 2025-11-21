@@ -16,7 +16,7 @@
 <body class="bg-[#0f0f1b] text-gray-100 min-h-screen flex items-center justify-center p-4">
   <div class="w-full max-w-3xl mx-auto">
 
-    <!-- Form -->
+    <!-- Form Paste -->
     <div id="form" class="bg-[#161627] rounded-3xl shadow-2xl p-8 border border-purple-900/30">
       <h1 class="text-5xl md:text-6xl font-black text-center mb-10 gradient-text">RifqyPaste</h1>
       
@@ -40,29 +40,33 @@
       </div>
     </div>
 
-    <!-- View Paste -->
+    <!-- View Paste (SUDAH DIPERBAIKI) -->
     <div id="view" class="hidden bg-[#161627] rounded-3xl shadow-2xl p-8 border border-purple-900/30">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <h2 class="text-3xl md:text-4xl font-bold gradient-text">Paste siap!</h2>
-        <button onclick="location.href=''" class="text-purple-400 hover:text-purple-300 underline text-lg">+ Paste Baru</button>
-      </div>
+      <h2 class="text-4xl md:text-5xl font-black text-center mb-10 gradient-text">Paste siap!</h2>
 
-      <input type="text" id="link" class="w-full bg-[#0d0d1a] rounded-xl px-6 py-4 mb-6 font-mono text-sm break-all" readonly/>
+      <input type="text" id="link" class="w-full bg-[#0d0d1a] rounded-xl px-6 py-4 mb-6 font-mono text-sm break-all text-center" readonly/>
 
-      <pre class="bg-[#0d0d1a] rounded-2xl p-6 overflow-x-auto border border-purple-800/30 max-h-96">
+      <pre class="bg-[#0d0d1a] rounded-2xl p-6 overflow-x-auto border border-purple-800/30 max-h-96 mb-8">
 <code id="code" class="language-auto text-sm"></code>
       </pre>
 
-      <div class="flex flex-wrap gap-4 mt-8">
-        <button type="button" onclick="copy('link')" class="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-xl font-medium transition transform hover:scale-105">
+      <!-- Tombol-tombol rapi di bawah -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <button type="button" onclick="copy('link')" 
+          class="btn-gradient text-white font-bold py-4 rounded-xl hover:opacity-90 transform hover:scale-105 transition shadow-lg">
           Copy Link
         </button>
-        <button type="button" onclick="copy('code')" class="bg-gray-700 hover:bg-gray-600 px-8 py-4 rounded-xl font-medium transition transform hover:scale-105">
+        <button type="button" onclick="copy('code')" 
+          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl transition transform hover:scale-105 shadow-lg">
           Copy Teks
+        </button>
+        <button type="button" onclick="location.href=''" 
+          class="bg-purple-900/50 hover:bg-purple-800 text-white font-bold py-4 rounded-xl transition transform hover:scale-105 shadow-lg border border-purple-700">
+          + Paste Baru
         </button>
       </div>
 
-      <p class="text-gray-500 text-sm text-center mt-8">
+      <p class="text-gray-500 text-center text-sm mt-8">
         Data disimpan di URL • Aman & privat • Bisa dibagikan ke siapa saja
       </p>
     </div>
