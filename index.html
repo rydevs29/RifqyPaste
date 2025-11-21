@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RifqyPaste – Paste Fast and Safe</title>
+  <title>RifqyPaste – Paste Cepat & Aman</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
@@ -20,21 +20,26 @@
     <div id="form" class="bg-[#161627] rounded-3xl shadow-2xl p-8 border border-purple-900/30">
       <h1 class="text-5xl md:text-6xl font-black text-center mb-10 gradient-text">RifqyPaste</h1>
       
-      <textarea id="content" placeholder="Paste teks atau kode di sini..." 
+      <textarea id="content" 
+        placeholder-id="Paste teks atau kode di sini..." 
+        placeholder-en="Paste your text or code here..."
         class="w-full h-64 md:h-80 bg-[#0d0d1a] border border-purple-800/50 rounded-2xl p-6 text-sm md:text-base font-mono focus:outline-none focus:border-purple-500 transition resize-none"
         autofocus></textarea>
       
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
         <select id="expire" class="bg-[#0d0d1a] border border-purple-800/50 rounded-xl px-5 py-4 focus:border-purple-500 focus:outline-none transition">
-          <option value="3600">1 Jam</option>
-          <option value="86400" selected>24 Jam</option>
-          <option value="604800">7 Hari</option>
-          <option value="0">Selamanya</option>
+          <option value="3600"  data-id="1 Jam"     data-en="1 Hour">1 Jam</option>
+          <option value="86400" selected data-id="24 Jam"   data-en="24 Hours">24 Jam</option>
+          <option value="604800" data-id="7 Hari"    data-en="7 Days">7 Hari</option>
+          <option value="0"     data-id="Selamanya" data-en="Forever">Selamanya</option>
         </select>
-        <input type="password" id="password" placeholder="Password (opsional)" 
+        <input type="password" id="password" 
+          placeholder-id="Password (opsional)" 
+          placeholder-en="Password (optional)"
           class="bg-[#0d0d1a] border border-purple-800/50 rounded-xl px-5 py-4 placeholder-gray-500 focus:border-purple-500 focus:outline-none transition"/>
         <button type="button" onclick="createPaste()" 
-          class="btn-gradient text-white font-bold py-4 rounded-xl hover:opacity-90 transform hover:scale-105 transition shadow-lg">
+          class="btn-gradient text-white font-bold py-4 rounded-xl hover:opacity-90 transform hover:scale-105 transition shadow-lg"
+          data-id="Buat Paste" data-en="Create Paste">
           Buat Paste
         </button>
       </div>
@@ -42,7 +47,10 @@
 
     <!-- View Paste -->
     <div id="view" class="hidden bg-[#161627] rounded-3xl shadow-2xl p-8 border border-purple-900/30">
-      <h2 class="text-4xl md:text-5xl font-black text-center mb-10 gradient-text">Link Pastemu Sudah Siap</h2>
+      <h2 class="text-4xl md:text-5xl font-black text-center mb-10 gradient-text"
+          data-id="Link Pastemu Sudah Siap" data-en="Your Paste Link is Ready">
+        Link Pastemu Sudah Siap
+      </h2>
 
       <input type="text" id="link" class="w-full bg-[#0d0d1a] rounded-xl px-6 py-4 mb-6 font-mono text-sm break-all text-center" readonly/>
 
@@ -50,36 +58,55 @@
         <code id="code" class="language-auto text-sm"></code>
       </pre>
 
-      <!-- Tombol-tombol rapi di bawah -->
+      <!-- Tombol-tombol -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <button type="button" onclick="copy('link')" 
-          class="btn-gradient text-white font-bold py-4 rounded-xl hover:opacity-90 transform hover:scale-105 transition shadow-lg">
+          class="btn-gradient text-white font-bold py-4 rounded-xl hover:opacity-90 transform hover:scale-105 transition shadow-lg"
+          data-id="Copy Link" data-en="Copy Link">
           Copy Link
         </button>
         <button type="button" onclick="copy('code')" 
-          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl transition transform hover:scale-105 shadow-lg">
+          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl transition transform hover:scale-105 shadow-lg"
+          data-id="Copy Teks" data-en="Copy Text">
           Copy Teks
         </button>
         <button type="button" onclick="location.href=''" 
-          class="bg-purple-900/60 hover:bg-purple-800 text-white font-bold py-4 rounded-xl transition transform hover:scale-105 shadow-lg border border-purple-700">
+          class="bg-purple-900/60 hover:bg-purple-800 text-white font-bold py-4 rounded-xl transition transform hover:scale-105 shadow-lg border border-purple-700"
+          data-id="Membuat Paste Baru" data-en="Create New Paste">
           Membuat Paste Baru
         </button>
       </div>
 
-      <p class="text-gray-500 text-center text-sm mt-8">
+      <p class="text-gray-500 text-center text-sm mt-8"
+         data-id="Data disimpan dengan aman" 
+         data-en="Data stored securely">
         Data disimpan dengan aman
       </p>
     </div>
   </div>
 
   <script>
-    // Load paste dari URL hash
+    // Deteksi bahasa otomatis (Indonesia / English)
+    const userLang = (navigator.language || navigator.userLanguage || 'id').toLowerCase();
+    const isID = userLang.startsWith('id');
+
+    // Terjemahkan semua teks otomatis
+    document.querySelectorAll('[data-id],[data-en]').forEach(el => {
+      el.textContent = isID ? (el.dataset.id || el.textContent) : (el.dataset.en || el.textContent);
+    });
+    document.querySelectorAll('[placeholder-id],[placeholder-en]').forEach(el => {
+      el.placeholder = isID ? (el.getAttribute('placeholder-id') || el.placeholder) 
+                            : (el.getAttribute('placeholder-en') || el.placeholder);
+    });
+
+    // Load paste dari hash
     if (location.hash) {
       try {
         const data = JSON.parse(decodeURIComponent(location.hash.slice(1)));
         if (data.expire && Date.now() > data.expire) throw "expired";
         if (data.password) {
-          const p = prompt("Masukkan password:");
+          const msg = isID ? "Masukkan password:" : "Enter password:";
+          const p = prompt(msg);
           if (p !== data.password) throw "wrong";
         }
         document.getElementById('form').classList.add('hidden');
@@ -88,14 +115,17 @@
         document.getElementById('link').value = location.href.split('#')[0];
         Prism.highlightAll();
       } catch(e) {
-        alert(e === "expired" ? "Paste sudah expired!" : "Password salah atau link rusak!");
+        const msg = e === "expired" 
+          ? (isID ? "Paste sudah expired!" : "Paste has expired!")
+          : (isID ? "Password salah atau link rusak!" : "Wrong password or invalid link!");
+        alert(msg);
         location.hash = '';
       }
     }
 
     function createPaste() {
       const content = document.getElementById('content').value.trim();
-      if (!content) return alert("Isi dulu teksnya ya!");
+      if (!content) return alert(isID ? "Isi dulu teksnya ya!" : "Please enter some text!");
 
       const expire = document.getElementById('expire').value;
       const password = document.getElementById('password').value || null;
@@ -110,29 +140,24 @@
       Prism.highlightAll();
     }
 
-    // COPY YANG 100% JALAN DI SEMUA HP & DESKTOP
+    // Copy yang pasti jalan di semua device
     function copy(type) {
-      let text = type === 'link' ? document.getElementById('link').value : document.getElementById('code').textContent;
-
+      const text = type === 'link' ? document.getElementById('link').value : document.getElementById('code').textContent;
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).then(() => {
-          alert(type === 'link' ? "Link disalin!" : "Teks disalin!");
-        }).catch(() => fallbackCopy(text, type));
+          alert(isID ? (type === 'link' ? "Link disalin!" : "Teks disalin!") 
+                     : (type === 'link' ? "Link copied!" : "Text copied!"));
+        }).catch(() => fallbackCopy(text));
       } else {
-        fallbackCopy(text, type);
+        fallbackCopy(text);
       }
     }
 
-    function fallbackCopy(text, type) {
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-      alert(type === 'link' ? "Link disalin!" : "Teks disalin!");
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      alert(isID ? "Berhasil disalin!" : "Copied!");
     }
   </script>
 </body>
